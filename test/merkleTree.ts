@@ -2,7 +2,7 @@
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 import {Fr} from "@aztec/bb.js/dest/node/types";
-import {newBarretenbergApiSync} from "@aztec/bb.js";
+import {newBarretenbergApiSync} from "@aztec/bb.js/dest/node";
 
 export interface IMerkleTree {
     root: () => Fr;

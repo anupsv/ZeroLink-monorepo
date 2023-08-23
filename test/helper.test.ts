@@ -1,46 +1,64 @@
-// @ts-ignore
-import ethers, { Contract } from 'ethers';
-import { test, beforeAll, describe, expect } from 'vitest';
-import {Fr} from "@aztec/bb.js/dest/node/types";
+import { expect } from 'chai';
+// import { describe, it } from 'mocha';
+import { NoirNode } from "./NoirNode";
+import { convertToHex } from "./common";
+
+import { beforeAll, afterAll, describe } from 'vitest';
+import circuit from '../circuits/target/zerolink.json' assert { type: "json" };
 import {MerkleTree} from "./merkleTree";
-import blake2 from 'blake2';
+import {Fr} from "@aztec/bb.js/dest/node/types";
+import {Buffer} from "buffer";
 
-describe('Setup', () => {
+const noir = new NoirNode();
 
-  let merkleTree: MerkleTree;
+describe('Integration tests', function () {
+  let merkleData: any;
 
   beforeAll(async () => {
+    await noir.init(circuit);
+    merkleData = await getMerkleTree();
+    console.log(merkleData);
 
-    let arr = [
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92267",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92268",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92269",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92260",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92261",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92262",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92263",
-      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92264"
-    ];
-    merkleTree = new MerkleTree(4);
-    const denied = Fr.fromBuffer(Buffer.from("denied"));
-    const allowed = Fr.fromBuffer(Buffer.from("allowed"));
-    await merkleTree.initialize([]);
-
-    await Promise.all(
-        arr.map(async (addr: any) => {
-          // @ts-ignore
-          const leaf = Fr.fromString(addr);
-          merkleTree.insert(leaf);
-        }),
-    );
-    let index = merkleTree.getIndex(Fr.fromString("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92264"));
-    console.log(index);
-    console.log(merkleTree.root().toString());
-    console.log(merkleTree.proof(index).pathElements.map(el => el.toString()));
+    // let mt= new MerkleTree(2);
+    // mt.initialize([]);
+    // mt.insert(Fr.fromBuffer(Buffer.from("1")))
+    // mt.insert(Fr.fromBuffer(Buffer.from("2")))
+    // mt.insert(Fr.fromBuffer(Buffer.from("3")))
+    // mt.insert(Fr.fromBuffer(Buffer.from("4")))
+    // console.log(mt.root().toString())
   });
 
-  test('adds 1 + 2 to equal 3', () => {
-    expect(1+2).toBe(3);
+  afterAll(async () => {
+    await noir.destroy();
   });
+
+  function generateInitialWitness(input: any) {
+    const initialWitness = new Map<number, string>();
+
+    initialWitness.set(1, input.root);
+    initialWitness.set(2, convertToHex(input.index));
+    initialWitness.set(3, input.hash_path[0]);
+    initialWitness.set(4, input.hash_path[1]);
+    initialWitness.set(5, convertToHex(input.secret));
+    initialWitness.set(6, convertToHex(input.proposalId));
+
+    return initialWitness;
+  }
+
+  async function getMerkleTree() {
+    let commitment1 = await noir.pedersenHash([BigInt(110386806875492)]);
+    let commitment2 = await noir.pedersenHash([BigInt(27422285723297124)]);
+    let commitment3 = await noir.pedersenHash([BigInt(110386806875492)]);
+    let commitment4 = await noir.pedersenHash([BigInt(110386806875492)]);
+
+    let leftSubtree = await noir.pedersenHash([commitment1, commitment2]);
+    let rightSubtree = await noir.pedersenHash([commitment3, commitment4]);
+
+    let root = await noir.pedersenHash([leftSubtree, rightSubtree]);
+
+    return {
+      root: convertToHex(root),
+      hashPath: [convertToHex(commitment2), convertToHex(rightSubtree)]
+    }
+  }
 });
