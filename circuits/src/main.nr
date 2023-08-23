@@ -1,61 +1,47 @@
-global CANDIDATES: Field = 2;
-
 use dep::std;
 
+global ALLOWED: Field = 27422285723297124; // essentially value of "allowed"
+global DENIED: Field = 110386806875492; // essentially value of "denied"
+
+
+// Change 12345 hash to value of "allowed"
+
+
 /// Main circuit.
-fn main(
-  receiver: pub Field,
-  nullifier: pub Field,
-  secret: Field,
-  polynomial: [Field; CANDIDATES],
-  commitment: pub Field,
-) {
-  // Compute `leaf` using `nullifier` and `secret`.
-  let leaf: Field = std::hash::pedersen([nullifier, secret])[0];
+fn main(subTreeRoot: Field, subTreePath: [Field; 3], nullifier: Field, randomSecret: Field, subTreeLeafIndex: Field) {
 
-  // Ensure `leaf` is included in the polynomial.
-  assert(evaluate_polynomial(polynomial, leaf) == 0);
-
-  // Ensure the the public commitment corresponds to the provided polynomial.
-  assert(std::hash::pedersen(polynomial)[0] == commitment);
-
-  // Tie `receiver` into proof.
-  assert(receiver != 0);
-}
-
-/// Evaluate a polynomial with given roots at `x`.
-fn evaluate_polynomial(polynomial: [Field; CANDIDATES], x: Field) -> Field {
-  let mut out: Field = 1;
-
-  for i in 0..CANDIDATES {
-    out *= (x - polynomial[i]);
-  }
+  // Step 1 verify the nullifier and secret
+  let calculatedNullifier: Field = std::hash::pedersen([randomSecret, subTreeLeafIndex])[0];
+  // assert(calculatedNullifier == nullifier);
   
-  out
+  // Step 2: Verify if the subtree is valid.
+  let subTreeCalculatedRoot: Field = verify_tree(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, subTreeLeafIndex, subTreePath, subTreeRoot);
+
+  // Step 3: Verify if the main tree is now valid
+  // assert(verify_tree(subTreeCalculatedRoot, depositTreeIndex, depositTreePath, depositTreeRoot) == depositTreeRoot);
+
 }
 
+fn verify_tree(leafValue: Field, index: Field, treePath: [Field; 3], treeRoot: Field) -> Field {
+  let merkle_root = std::merkle::compute_merkle_root(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, 0, treePath);
+  assert(merkle_root == treeRoot);
+  merkle_root
+}
+
+fn doit(root: Field) {
+  let pathElements: [Field; 4] = [
+  0x18d85f3de6dcd78b6ffbf5d8374433a5528d8e3bf2100df0b7bb43a4c59ebd63,
+  0x06fd146950e6d7bad88f6ce0d22eaf9544832b3d17158ec62f32cbaf3ae59ecd,
+  0x17dba07b1f54e623fce562e728c07be7e02e1fe66e9fd5df2e9e231eaa03c9c3,
+  0x1d140f891daded13a72450fbf94b3618815c6b931ffe4dec89d4b0588a44e02e
+];
+  let merkle_root = std::merkle::compute_merkle_root(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92264, 8, pathElements);
+  std::println(merkle_root);
+  assert(merkle_root == root);
+}
 
 #[test]
 fn test_main() {
-  let receiver: Field = 0xbabe;
-  let nullifier: Field = 1234;
-  let secret: Field = 33887744;
-
-  let leaf: Field = std::hash::pedersen([nullifier, secret])[0];
-
-  let polynomial = [
-    leaf,
-    0x30644e72e131a029b85045b51d480807486e4c754ae9f95bbfba6db6d86a63d3,
-  ];
-
-  let commitment = std::hash::pedersen(polynomial)[0];
-
-  std::println(f"receiver: {receiver}");
-  std::println(f"nullifier: {nullifier}");
-  std::println(f"secret: {secret}");
-  std::println(f"leaf: {leaf}");
-  std::println(f"commitment: {commitment}");
-
-  main(receiver, nullifier, secret, polynomial, commitment);
+  doit(0x08e409b71b9c9cf6456f5abf1a0a717cf0a3249c7cfa98ccfffccdac461afad1);
 }
 
