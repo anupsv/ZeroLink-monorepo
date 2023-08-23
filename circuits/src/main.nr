@@ -8,40 +8,54 @@ global DENIED: Field = 110386806875492; // essentially value of "denied"
 
 
 /// Main circuit.
-fn main(subTreeRoot: Field, subTreePath: [Field; 3], nullifier: Field, randomSecret: Field, subTreeLeafIndex: Field) {
+fn main(subTreeRoot: Field, subTreePath: [Field; 2], nullifier: Field, randomSecret: Field, subTreeLeafIndex: Field, depositTreeIndex: Field, depositTreePath: [Field; 2], depositTreeRoot: Field) {
 
   // Step 1 verify the nullifier and secret
   let calculatedNullifier: Field = std::hash::pedersen([randomSecret, subTreeLeafIndex])[0];
-  // assert(calculatedNullifier == nullifier);
+  assert(calculatedNullifier == nullifier);
   
   // Step 2: Verify if the subtree is valid.
-  let subTreeCalculatedRoot: Field = verify_tree(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, subTreeLeafIndex, subTreePath, subTreeRoot);
+  let subTreeCalculatedRoot: Field = verify_tree(std::hash::pedersen([ALLOWED])[0], subTreeLeafIndex, subTreePath, subTreeRoot);
 
   // Step 3: Verify if the main tree is now valid
-  // assert(verify_tree(subTreeCalculatedRoot, depositTreeIndex, depositTreePath, depositTreeRoot) == depositTreeRoot);
+  verify_tree(subTreeCalculatedRoot, depositTreeIndex, depositTreePath, depositTreeRoot);
 
 }
 
-fn verify_tree(leafValue: Field, index: Field, treePath: [Field; 3], treeRoot: Field) -> Field {
-  let merkle_root = std::merkle::compute_merkle_root(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, 0, treePath);
+fn verify_tree(leafValue: Field, index: Field, treePath: [Field; 2], treeRoot: Field) -> Field {
+  let merkle_root = std::merkle::compute_merkle_root(leafValue, index, treePath);
   assert(merkle_root == treeRoot);
   merkle_root
 }
 
-fn doit(root: Field) {
-  let pathElements: [Field; 4] = [
-  0x18d85f3de6dcd78b6ffbf5d8374433a5528d8e3bf2100df0b7bb43a4c59ebd63,
-  0x06fd146950e6d7bad88f6ce0d22eaf9544832b3d17158ec62f32cbaf3ae59ecd,
-  0x17dba07b1f54e623fce562e728c07be7e02e1fe66e9fd5df2e9e231eaa03c9c3,
-  0x1d140f891daded13a72450fbf94b3618815c6b931ffe4dec89d4b0588a44e02e
-];
-  let merkle_root = std::merkle::compute_merkle_root(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92264, 8, pathElements);
-  std::println(merkle_root);
-  assert(merkle_root == root);
-}
 
 #[test]
-fn test_main() {
-  doit(0x08e409b71b9c9cf6456f5abf1a0a717cf0a3249c7cfa98ccfffccdac461afad1);
-}
 
+fn test_subtree_allow_verification_with_deposit_tree() {
+
+  // got tired with dicking around with the TS thing. doing this raw
+  // Generate the root and pass it in
+  let sub_tree_1 = std::hash::pedersen([110386806875492])[0]; // denied deposit
+  let sub_tree_2 = std::hash::pedersen([27422285723297124])[0]; // allowed deposit
+  let sub_tree_3 = std::hash::pedersen([110386806875492])[0]; // denied deposit
+  let sub_tree_4 = std::hash::pedersen([110386806875492])[0]; // denied deposit
+
+  let sub_tree_left_branch = std::hash::pedersen([sub_tree_1, sub_tree_2])[0];
+  let sub_tree_right_branch = std::hash::pedersen([sub_tree_3, sub_tree_4])[0];
+
+  let sub_tree_root = std::hash::pedersen([sub_tree_left_branch,  sub_tree_right_branch])[0];
+
+
+  // Now the main tree
+  let main_tree_1 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  let main_tree_2 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  let main_tree_3 = sub_tree_root; // concerned subtree deposit
+  let main_tree_4 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+
+  let main_tree_left_branch = std::hash::pedersen([main_tree_1, main_tree_2])[0];
+  let main_tree_right_branch = std::hash::pedersen([main_tree_3, main_tree_4])[0];
+
+  let main_tree_root = std::hash::pedersen([main_tree_left_branch,  main_tree_right_branch])[0];
+
+  main(sub_tree_root, [sub_tree_1, sub_tree_right_branch], std::hash::pedersen([5, 1])[0], 5, 1, 2, [main_tree_4, main_tree_left_branch], main_tree_root);
+}
