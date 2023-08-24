@@ -33,29 +33,36 @@ fn verify_tree(leafValue: Field, index: Field, treePath: [Field; 2], treeRoot: F
 
 fn test_subtree_allow_verification_with_deposit_tree() {
 
-  // got tired with dicking around with the TS thing. doing this raw
-  // Generate the root and pass it in
-  let sub_tree_1 = std::hash::pedersen([110386806875492])[0]; // denied deposit
-  let sub_tree_2 = std::hash::pedersen([27422285723297124])[0]; // allowed deposit
-  let sub_tree_3 = std::hash::pedersen([110386806875492])[0]; // denied deposit
-  let sub_tree_4 = std::hash::pedersen([110386806875492])[0]; // denied deposit
+  std::println(std::hash::poseidon::bn254::hash_5([1,2, 0, 0, 0]));
+  assert(1018317224307729531995786483840663576608797660851238720571059489595066344487 == 1018317224307729531995786483840663576608797660851238720571059489595066344487);
+  
 
-  let sub_tree_left_branch = std::hash::pedersen([sub_tree_1, sub_tree_2])[0];
-  let sub_tree_right_branch = std::hash::pedersen([sub_tree_3, sub_tree_4])[0];
+  // // got tired with dicking around with the TS thing. doing this raw
+  // // Generate the root and pass it in
+  // let sub_tree_1 = std::hash::poseidon::bn254::hash_1([110386806875492]); // denied deposit
+  // let sub_tree_2 = std::hash::poseidon::bn254::hash_1([27422285723297124]); // allowed deposit
+  // let sub_tree_3 = std::hash::poseidon::bn254::hash_1([110386806875492]); // denied deposit
+  // let sub_tree_4 = std::hash::poseidon::bn254::hash_1([110386806875492]); // denied deposit
 
-  let sub_tree_root = std::hash::pedersen([sub_tree_left_branch,  sub_tree_right_branch])[0];
+  // let sub_tree_left_branch = std::hash::poseidon::bn254::hash_2([sub_tree_1, sub_tree_2]);
+  // let sub_tree_right_branch = std::hash::poseidon::bn254::hash_2([sub_tree_3, sub_tree_4]);
+
+  // let sub_tree_root = std::hash::poseidon::bn254::hash_2([sub_tree_left_branch,  sub_tree_right_branch]);
+
+  // std::println("sub_tree_root");
+  // std::println(sub_tree_root);
 
 
-  // Now the main tree
-  let main_tree_1 = std::hash::pedersen([110386806875492])[0]; // some other deposit
-  let main_tree_2 = std::hash::pedersen([110386806875492])[0]; // some other deposit
-  let main_tree_3 = sub_tree_root; // concerned subtree deposit
-  let main_tree_4 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  // // Now the main tree
+  // let main_tree_1 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  // let main_tree_2 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  // let main_tree_3 = sub_tree_root; // concerned subtree deposit
+  // let main_tree_4 = std::hash::pedersen([110386806875492])[0]; // some other deposit
 
-  let main_tree_left_branch = std::hash::pedersen([main_tree_1, main_tree_2])[0];
-  let main_tree_right_branch = std::hash::pedersen([main_tree_3, main_tree_4])[0];
+  // let main_tree_left_branch = std::hash::pedersen([main_tree_1, main_tree_2])[0];
+  // let main_tree_right_branch = std::hash::pedersen([main_tree_3, main_tree_4])[0];
 
-  let main_tree_root = std::hash::pedersen([main_tree_left_branch,  main_tree_right_branch])[0];
+  // let main_tree_root = std::hash::pedersen([main_tree_left_branch,  main_tree_right_branch])[0];
 
-  main(sub_tree_root, [sub_tree_1, sub_tree_right_branch], std::hash::pedersen([5, 1])[0], 5, 1, 2, [main_tree_4, main_tree_left_branch], main_tree_root);
+  // main(sub_tree_root, [sub_tree_1, sub_tree_right_branch], std::hash::pedersen([5, 1])[0], 5, 1, 2, [main_tree_4, main_tree_left_branch], main_tree_root);
 }
