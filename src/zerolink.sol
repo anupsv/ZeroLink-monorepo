@@ -2,8 +2,10 @@
 pragma solidity ^0.8.13;
 
 import {MerkleTreeWithHistory} from "./merkleTree.sol";
+import {UltraVerifier} from "../circuits/contract/zerolink/plonk_vk.sol";
 
-contract ZeroLink is MerkleTreeWithHistory {
+
+contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
     error InvalidNodes();
     error NullifierUsed();
     error RefundFailed();
@@ -11,29 +13,38 @@ contract ZeroLink is MerkleTreeWithHistory {
     error UnknownRoot();
 
     uint256 constant DEPOSIT_AMOUNT = 0.001 ether;
+    // left to right is the order, same as how the leaves are filled.
+    uint blocked = 0;
 
-    mapping(bytes32 => bool) nullifierUsed;
+    mapping(uint => bool) nullifierUsed;
 
-    constructor(address poseidon) MerkleTreeWithHistory(4, poseidon) {}
+    constructor(address poseidon) MerkleTreeWithHistory(2, poseidon) {}
+
+    event Deposit(uint indexed commitment, uint leafIndex, uint256 timestamp);
+
+    function updateBlocked(uint newValue) public {
+        blocked = newValue;
+    }
 
     function deposit(uint nullifierSecretHash) public payable returns (uint256) {
         // Require 1 ether deposit value.
-        // if (msg.value != 0.001 ether) revert InvalidDepositAmount();
+        if (msg.value != DEPOSIT_AMOUNT) revert InvalidDepositAmount();
 
         // Compute and update root with `nullifierSecretHash` inserted at `key` index.
-        bytes32 leaf = bytes32(hasher_2.hash([nullifierSecretHash, uint(msg.value)]));
+        bytes32 leaf = bytes32(hasher_2.hash([nullifierSecretHash, uint(1)]));
         uint leafIndex = _insert(leaf);
-
+        
+        emit Deposit(nullifierSecretHash, leafIndex, block.timestamp);
         return leafIndex;
     }
 
-    function withdraw(bytes calldata proof, bytes32 nullifier, bytes32 subTreeRoot, bytes32 depositTreeRoot) public {
+    function withdraw(bytes calldata proof, uint nullifier, bytes32 subTreeRoot) public {
         // Check `nullifier` to prevent replay.
         if (nullifierUsed[nullifier]) revert NullifierUsed();
 
         // check only the main root because its sufficient as the subroot will be checked for inclusion.
         // Every subroot change will change the main root, so no point in checking both.
-        if (!isKnownRoot(depositTreeRoot)) revert UnknownRoot();
+        if (!isKnownRoot(subTreeRoot)) revert UnknownRoot();
         // Mark `nullifier` as used.
         nullifierUsed[nullifier] = true;
 
@@ -42,30 +53,22 @@ contract ZeroLink is MerkleTreeWithHistory {
         //   - The leaf is contained in merkle tree with `subTreeRoot`.
         //   - The subroot is now a leaf of the depositTreeRoot
         //   - The proof is generated for `receiver`.
-        // _verifyProof(recipient, nullifier, subTreeRoot, depositTreeRoot, proof);
+        _verifyProof(nullifier, subTreeRoot, proof);
 
         // Refund caller.
-        // (bool success,) = msg.sender.call{value: 1 ether}("");
-        // if (!success) revert RefundFailed();
+        (bool success,) = msg.sender.call{value: DEPOSIT_AMOUNT}("");
+        if (!success) revert RefundFailed();
     }
 
-    // function _verifyProof(address receiver, bytes32 nullifier, bytes32 subTreeRoot, bytes32 depositTreeRoot, bytes calldata proof) internal view {
-    //     // Set up public inputs for `proof` verification.
-    //     bytes32[] memory publicInputs = new bytes32[](65);
+    function _verifyProof(uint nullifier, bytes32 subTreeRoot, bytes calldata proof) internal view {
+        // Set up public inputs for `proof` verification.
+        bytes32[] memory publicInputs = new bytes32[](3);
 
-    //     publicInputs[0] = bytes32(uint256(uint160(receiver)));
-    //     // publicInputs[1] = nullifier;
-    //     // publicInputs[2] = root_;
+        publicInputs[0] = subTreeRoot;
+        publicInputs[1] = bytes32(nullifier);
+        publicInputs[2] = bytes32(blocked);
 
-    //     for (uint256 i; i < 32; i++) {
-    //         publicInputs[1 + i] = bytes32(uint256(uint8(nullifier[i])));
-    //     }
-
-    //     for (uint256 i; i < 32; i++) {
-    //         publicInputs[33 + i] = bytes32(uint256(uint8(root_[i])));
-    //     }
-
-    //     // Verify zero knowledge proof.
-    //     this.verify(proof, publicInputs);
-    // }
+        // Verify zero knowledge proof.
+        this.verify(proof, publicInputs);
+    }
 }
