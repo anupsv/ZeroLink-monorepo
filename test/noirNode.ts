@@ -89,7 +89,6 @@ export class NoirNode {
 
             hexData.push(num);
         }
-
         let hash = await this.api.pedersenPlookupCommit(hexData);
         return hash.value;
     }
