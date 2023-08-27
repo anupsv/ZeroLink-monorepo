@@ -2,19 +2,12 @@
 
 pragma solidity ^0.8.3;
 
-interface Hasher {
-    function hash(uint[2] calldata leftRight)
-        external
-        pure
-        returns (uint);
-}
+import {Poseidon} from "./Poseidon.sol";
 
 contract MerkleTreeWithHistory {
     uint256 public constant FIELD_SIZE =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
     uint256 public constant ZERO_VALUE = 6632486495108437456156696552582218977522709442034624339811444676573407893214; // = poseidon_hash_1("empty")
-
-    Hasher public hasher_2;
 
     uint32 public immutable levels;
 
@@ -25,18 +18,14 @@ contract MerkleTreeWithHistory {
     uint32 public constant ROOT_HISTORY_SIZE = 100;
     bytes32[ROOT_HISTORY_SIZE] public roots;
 
-    constructor(uint32 _treeLevels, address _hasher2) {
-        require(_treeLevels > 0, "_treeLevels should be greater than zero");
-        require(_treeLevels < 32, "_treeLevels should be less than 32");
-
-        hasher_2 = Hasher(_hasher2);
-        levels = _treeLevels;
+    constructor() {
+        levels = 2;
 
         bytes32 currentZero = bytes32(ZERO_VALUE);
         zeros.push(currentZero);
         filledSubtrees.push(currentZero);
 
-        for (uint32 i = 1; i < _treeLevels; i++) {
+        for (uint32 i = 1; i < levels; i++) {
             currentZero = hashLeftRight(currentZero, currentZero);
             zeros.push(currentZero);
             filledSubtrees.push(currentZero);
@@ -50,7 +39,7 @@ contract MerkleTreeWithHistory {
   */
     function hashLeftRight(bytes32 _left, bytes32 _right)
         public
-        view
+        pure
         returns (bytes32)
     {
         require(
@@ -62,7 +51,7 @@ contract MerkleTreeWithHistory {
             "_right should be inside the field"
         );
         uint[2] memory leftright = [uint(_left), uint(_right)];
-        return bytes32(hasher_2.hash(leftright));
+        return bytes32(Poseidon.hash(leftright));
     }
 
     function _insert(bytes32 _leaf) internal returns (uint32 index) {
@@ -80,7 +69,6 @@ contract MerkleTreeWithHistory {
             if (currentIndex % 2 == 0) {
                 left = currentLevelHash;
                 right = zeros[i];
-
                 filledSubtrees[i] = currentLevelHash;
             } else {
                 left = filledSubtrees[i];

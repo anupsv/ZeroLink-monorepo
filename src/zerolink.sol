@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {MerkleTreeWithHistory} from "./merkleTree.sol";
+import {Poseidon} from "./Poseidon.sol";
 import {UltraVerifier} from "../circuits/contract/zerolink/plonk_vk.sol";
 
 
@@ -18,7 +19,7 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
 
     mapping(uint => bool) nullifierUsed;
 
-    constructor(address poseidon) MerkleTreeWithHistory(2, poseidon) {}
+    constructor() MerkleTreeWithHistory() {}
 
     event Deposit(uint indexed commitment, uint leafIndex, uint256 timestamp);
 
@@ -31,7 +32,7 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
         if (msg.value != DEPOSIT_AMOUNT) revert InvalidDepositAmount();
 
         // Compute and update root with `nullifierSecretHash` inserted at `key` index.
-        bytes32 leaf = bytes32(hasher_2.hash([nullifierSecretHash, uint(1)]));
+        bytes32 leaf = bytes32(Poseidon.hash([nullifierSecretHash, uint(1)]));
         uint leafIndex = _insert(leaf);
         
         emit Deposit(nullifierSecretHash, leafIndex, block.timestamp);
