@@ -38,15 +38,15 @@ contract ZeroLink is UltraVerifier {
     ///      at `key`.
     ///      The leaf `nullifierSecretHash` is the hash of the
     ///      `nullifier` and `secret` private values.
-    function deposit(bytes32 nullifierSecretHash) public payable {
+    function deposit(uint nullifierSecretHash) public payable {
         // Require 1 ether deposit value.
         if (msg.value != 1 ether) revert InvalidDepositAmount();
         // Prevent committing an already existing leaf as
         // the `nullifier` cannot be spent twice.
-        if (committedLeafs[nullifierSecretHash]) revert LeafAlreadyCommitted();
+        if (committedLeafs[bytes32(nullifierSecretHash)]) revert LeafAlreadyCommitted();
 
         // Mark the leaf as committed.
-        committedLeafs[nullifierSecretHash] = true;
+        committedLeafs[bytes32(nullifierSecretHash)] = true;
 
         // Store old `root` in `roots` array and increase `rootsIndex`.
         roots[rootsIndex++ % NUM_ROOTS] = root;
@@ -54,7 +54,7 @@ contract ZeroLink is UltraVerifier {
         // Append leaf `nullifierSecretHash` at index `key` of merkle tree.
         // Update merkle root and internal nodes inserting `nullifierSecretHash` at index `key`.
         // Increment the merkle tree index `key`.
-        (root, nodes) = MerkleLib.appendLeaf(key++, nullifierSecretHash, nodes);
+        (root, nodes) = MerkleLib.appendLeaf(key++, bytes32(nullifierSecretHash), nodes);
     }
 
     function withdraw(bytes32 nullifier, bytes32 root_, bytes calldata proof) public {
@@ -95,19 +95,11 @@ contract ZeroLink is UltraVerifier {
 
     function _verifyProof(address receiver, bytes32 nullifier, bytes32 root_, bytes calldata proof) internal view {
         // Set up public inputs for `proof` verification.
-        bytes32[] memory publicInputs = new bytes32[](65);
+        bytes32[] memory publicInputs = new bytes32[](3);
 
         publicInputs[0] = bytes32(uint256(uint160(receiver)));
-        // publicInputs[1] = nullifier;
-        // publicInputs[2] = root_;
-
-        for (uint256 i; i < 32; i++) {
-            publicInputs[1 + i] = bytes32(uint256(uint8(nullifier[i])));
-        }
-
-        for (uint256 i; i < 32; i++) {
-            publicInputs[33 + i] = bytes32(uint256(uint8(root_[i])));
-        }
+        publicInputs[1] = nullifier;
+        publicInputs[2] = root_;
 
         // Verify zero knowledge proof.
         this.verify(proof, publicInputs);

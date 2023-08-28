@@ -26,7 +26,6 @@ contract MerkleLibTest is Test {
 
         for (uint256 i; i < DEPTH + 1; i++) {
             node = MerkleLib.hash(node, node);
-
             assertEq(MerkleLib.zeros(i), node);
         }
     }
@@ -50,7 +49,7 @@ contract MerkleLibTest is Test {
         // Insert `leaf` into an empty tree (position 0).
         bytes32 root;
         uint256 key;
-        bytes32 leaf = keccak256("leaf_1");
+        bytes32 leaf = 0x29176100EAA962BDC1FE6C654D6A3C130E96A4D1168B33848B897DC502820133;
         bytes32[DEPTH] memory nodes;
 
         // Recompute root with `leaf` at leftmost key.
@@ -68,7 +67,7 @@ contract MerkleLibTest is Test {
 
         // Insert another `leaf` into tree at position 1.
         key = 1;
-        leaf = keccak256("leaf_2");
+        leaf = 0x131D73CF6B30079ACA0DFF6A561CD0EE50B540879ABE379A25A06B24BDE2BEBD;
 
         // First hash will be with left node ("leaf_1").
         root = MerkleLib.hash(nodes[0], leaf);
@@ -85,7 +84,7 @@ contract MerkleLibTest is Test {
 
         // Insert another `leaf` into tree.
         key = 2;
-        leaf = keccak256("leaf_3");
+        leaf = bytes32("0xD4E4D24B890FE6799BE4CF57AD13078EC0FBAA9FE91423BA8BBD0C2D7043BD4");
 
         // First hash will be with right zero node.
         root = MerkleLib.hash(leaf, MerkleLib.zeros(0));

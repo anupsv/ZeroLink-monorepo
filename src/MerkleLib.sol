@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-uint256 constant DEPTH = 4;
+import {Poseidon} from "./Poseidon.sol";
+
+uint256 constant DEPTH = 2;
 
 library MerkleLib {
     error InvalidZerosLevel();
@@ -9,12 +11,7 @@ library MerkleLib {
     /// @notice Efficiently hashes two values `left` and `right`.
     function hash(bytes32 left, bytes32 right) internal pure returns (bytes32 result) {
         /// @solidity memory-safe-assembly
-        assembly {
-            mstore(0x00, left)
-            mstore(0x20, right)
-
-            result := keccak256(0x00, 0x40)
-        }
+        return bytes32(Poseidon.hash([uint(left), uint(right)]));
     }
 
     /// @notice compute the merkle root starting with `leaf` at given `key`.
