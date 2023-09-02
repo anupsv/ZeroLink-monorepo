@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {UltraVerifier} from "../circuits/CommitmentProver/contract/ZeroLink/plonk_vk.sol";
+import {UltraVerifier} from "../circuits/CommitmentProver/contract/CommitmentProver/plonk_vk.sol";
 import {MerkleLib, DEPTH} from "./MerkleLib.sol";
 
 contract ZeroLink is UltraVerifier {
@@ -26,10 +26,7 @@ contract ZeroLink is UltraVerifier {
 
     constructor() {
         // Initialize inner nodes of empty tree.
-        for (uint256 i; i < DEPTH; ++i) {
-            nodes[i] = MerkleLib.zeros(i);
-        }
-        root = MerkleLib.zeros(DEPTH);
+        (root, nodes) = MerkleLib.getEmptyTree();
     }
 
     /// @dev Makes a deposit by committing a leaf node to an
@@ -85,9 +82,8 @@ contract ZeroLink is UltraVerifier {
         uint256 index = endIndex + NUM_ROOTS;
         do {
             // Cycle back `index`.
-            index = (index - 1) % NUM_ROOTS;
             // Return `true` if a valid previously committed root was found.
-            if (roots[index] == root) return true;
+            if (roots[(index--) % NUM_ROOTS] == root_) return true;
         } while (index != endIndex);
 
         return false;
