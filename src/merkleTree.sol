@@ -7,7 +7,7 @@ import {Poseidon} from "./Poseidon.sol";
 contract MerkleTreeWithHistory {
     uint256 public constant FIELD_SIZE =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
-    uint256 public constant ZERO_VALUE = 6632486495108437456156696552582218977522709442034624339811444676573407893214; // = poseidon_hash_1("empty")
+    uint256 public constant ZERO_VALUE = 19014214495641488759237505126948346942972912379615652741039992445865937985820; // = poseidon_hash_1("empty")
 
     uint32 public immutable levels;
 

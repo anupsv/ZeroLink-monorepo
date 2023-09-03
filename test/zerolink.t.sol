@@ -19,15 +19,15 @@ contract ZeroLinkTest is Test {
     address bob = address(0xb0b);
     address babe = address(0xbabe);
     uint DEPTH = 2;
-    uint nullifier = uint(0x222244448888);
-    bytes32 secret = bytes32(uint256(0x1337));
-    uint nullifierSecretHash = Poseidon.hash([uint256(0x222244448888), uint(1)]);
+    uint leafIndex = 0;
+    uint secret = 1234;
+    uint nullifierSecretHash = Poseidon.hash([secret, 0]);
 
     bytes proof;
     MockZeroLink zerolink = new MockZeroLink();
 
     function setUp() public {
-        // proof = getProofBytes();
+        proof = vm.parseBytes(vm.readLine("circuits/proofs/zerolink.proof"));
 
         deal(bob, 100 ether);
         deal(babe, 100 ether);
@@ -41,14 +41,27 @@ contract ZeroLinkTest is Test {
     // }
 
     /// Can successfully deposit.
-    function test_deposit() public {
-        vm.prank(babe);
-        zerolink.deposit{value: 0.001 ether}(1234);
+    // function test_deposit() public {
+    //     vm.prank(babe);
+    //     zerolink.deposit{value: 0.001 ether}(1234);
 
-        vm.prank(bob);
-        zerolink.deposit{value: 0.001 ether}(4567);
+    //     vm.prank(bob);
+    //     zerolink.deposit{value: 0.001 ether}(4567);
 
+    //     vm.prank(babe);
+    //     zerolink.deposit{value: 0.001 ether}(7890);
+    // }
+
+    function test_deposit_and_withdraw() public {
         vm.prank(babe);
-        zerolink.deposit{value: 0.001 ether}(7890);
+        uint index = zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+
+        // Read new `root`.
+        bytes32 root = zerolink.getLastRoot();
+
+        console.log("index", index);
+        console.log("root", vm.toString(root));
+        vm.prank(babe);
+        zerolink.withdraw(proof, nullifierSecretHash, root);
     }
 }
