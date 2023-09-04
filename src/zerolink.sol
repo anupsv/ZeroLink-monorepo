@@ -37,7 +37,7 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
         committedNullifier[nullifierSecretHash] = true;
 
         // Compute and update root with `nullifierSecretHash` inserted at `key` index.
-        bytes32 leaf = bytes32(Poseidon.hash([nullifierSecretHash, uint(1)]));
+        bytes32 leaf = bytes32(nullifierSecretHash);
         uint leafIndex = _insert(leaf);
         
         emit Deposit(nullifierSecretHash, leafIndex, block.timestamp, getLastRoot());

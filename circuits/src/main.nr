@@ -24,12 +24,10 @@ fn compute_merkle_root(leaf: Field, index: Field, hash_path: [Field; 2]) -> Fiel
 // Main circuit.
 fn main(subTreeRoot: pub Field, subTreePath: [Field; 2], nullifier: pub Field, randomSecret: Field, subTreeLeafIndex: Field, blocked: pub Field) {
 
-  // Step 1 verify the nullifier and secret
-  let calculatedNullifier: Field = std::hash::poseidon::bn254::hash_2([randomSecret, subTreeLeafIndex]);
-  assert(calculatedNullifier == nullifier);
+  let calculatedNullifier: Field = std::hash::poseidon::bn254::hash_2([nullifier, randomSecret]);
   
   // Step 2: Verify if the subtree is valid.
-  verify_tree(std::hash::poseidon::bn254::hash_2([nullifier, 1]), subTreeLeafIndex, subTreePath, subTreeRoot);
+  verify_tree(calculatedNullifier, subTreeLeafIndex, subTreePath, subTreeRoot);
 
   // Step 3: check if the leaf is blocked from withdrawal
   let bits = blocked.to_le_bits(32);
@@ -50,8 +48,8 @@ fn verify_tree(leafValue: Field, index: Field, treePath: [Field; 2], treeRoot: F
 fn test_subtree_allow_verification_with_deposit_tree() {
 
 //   // Generate the root and pass it in
-  let calculatedNullifier: Field = std::hash::poseidon::bn254::hash_2([1234, 0]);
-  let sub_tree_1 = std::hash::poseidon::bn254::hash_2([calculatedNullifier, 1]);
+  let calculatedNullifier: Field = std::hash::poseidon::bn254::hash_2([12356789, 1234]);
+  let sub_tree_1 = calculatedNullifier;
   let sub_tree_2 = std::hash::poseidon::bn254::hash_1([0]); 
   let sub_tree_3 = std::hash::poseidon::bn254::hash_1([0]); 
   let sub_tree_4 = std::hash::poseidon::bn254::hash_1([0]); 
@@ -62,25 +60,14 @@ fn test_subtree_allow_verification_with_deposit_tree() {
   let sub_tree_root = std::hash::poseidon::bn254::hash_2([sub_tree_left_branch,  sub_tree_right_branch]);
 
   // std::println(std::hash::poseidon::bn254::hash_2([1234, 1]));
-  // std::println(sub_tree_1);
-  // std::println(sub_tree_2);
+  std::println(sub_tree_1);
+  std::println(sub_tree_2);
   // std::println(sub_tree_left_branch);
-  // std::println(sub_tree_right_branch);
-  // std::println(sub_tree_root);
-  let x :Field = 123;
+  std::println(sub_tree_right_branch);
+  std::println(sub_tree_root);
 
-  std::println(x.to_le_bits(32).len());
 
-//   // // Now the main tree
-//   // let main_tree_1 = std::hash::pedersen([110386806875492])[0]; // some other deposit
-//   // let main_tree_2 = std::hash::pedersen([110386806875492])[0]; // some other deposit
-//   // let main_tree_3 = sub_tree_root; // concerned subtree deposit
-//   // let main_tree_4 = std::hash::pedersen([110386806875492])[0]; // some other deposit
+  let merkle_root = compute_merkle_root(sub_tree_1, 0, [sub_tree_2, sub_tree_right_branch]);
+  assert(merkle_root == sub_tree_root);
 
-//   // let main_tree_left_branch = std::hash::pedersen([main_tree_1, main_tree_2])[0];
-//   // let main_tree_right_branch = std::hash::pedersen([main_tree_3, main_tree_4])[0];
-
-//   // let main_tree_root = std::hash::pedersen([main_tree_left_branch,  main_tree_right_branch])[0];
-
-//   // main(sub_tree_root, [sub_tree_1, sub_tree_right_branch], std::hash::pedersen([5, 1])[0], 5, 1, 2, [main_tree_4, main_tree_left_branch], main_tree_root);
 }

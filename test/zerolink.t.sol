@@ -21,13 +21,14 @@ contract ZeroLinkTest is Test {
     uint DEPTH = 2;
     uint leafIndex = 0;
     uint secret = 1234;
-    uint nullifierSecretHash = Poseidon.hash([secret, leafIndex]);
+    uint nullifier = 12356789;
+    uint nullifierSecretHash = Poseidon.hash([nullifier, secret]);
 
     bytes proof;
     MockZeroLink zerolink = new MockZeroLink();
 
     function setUp() public {
-        proof = hex"09fd9b2007076eaa441bafd0691d62844a30a097b5c76336671481b8f8ee6b741267deb7b230d192e449fcddfe624b5e44a0f8ef74c9eb1aea700dc151f499e9276e22bd0ec386b0238718574b5b70c3a219a113d59abd99d8da8a6d696aa8ef10002ca03f5cb1b07ae9c906a642e5beae01aa3c33b7d86f8c4586a5620a152e1b4b6184c75a95f0df335183e06c1861c44355e0eaacf1a60e70ee854679a4f529b8bcb9f621d5e4a3994d46786cfbb4ce0a0ef67afeca8f6ff38547d50ed50d2cf3a5898e154e131a97a9ba3c255b76935d50e7c2c8c7da6e7495584788055c1120da3aa5286a4cdfc2a02bb4249cd07c06b2424f993a660fd1a5ff8c2fcccc2fc71011956872473b3daae31a645ad270ed91e2060fe8c0b33e90d4ccc9b4080bb656a974430b5c43bd571051a3f8257960d4658275262d0522b1f3a7c8e0291299571b06b1e8bba7d94d0680ec6a54428716573b0183929f18e95c302b40aa2d976e8859e741f8a354b5b49d8c8e090cb8d083295c505475c6a89f04a3f5d9069b6bad5455ed7e8a16302a32cab1a312b6d5aa0c53a36ff9d9392ac684ae0a21d62e9c44467e4b3a20a67dde69bf216b3930a5b98b874f23a75423242daa292132c707a1222484557f25d796def990e84d5e400decda1d78f2438a4e6d9f382490d2f221607843c9b1dd8487eb654232da61f4bef37d381a9d658b13eca94513d74daafda10719e2f7e9729f1f08168ce6b66a54dc4cdf269bf494ad899f38016ec00d8a1d2634e0000819e4abcc970e9e535257004c38f22dbc786c38d3fb0bfe8b86c0cd1c9b6c8acb904db6ef920d016274a8ff49f26ec0a89bd31566ae28250febd263ed4cfcf47f9eef5f7e5dcd5c2a204e4000246ec4a50f61f759c60f8a2de7a95cf81e0bdfdccf0aed1f6572022324bb2d31ef35ce88fcba2e9e55055a9e6dd7e42aaebf5537c95ec13ae9f29552399651cf129c15f22b07e58025014b0d061f90394b1f4f2f755fa2791212ecc2ad8d41d14913d8080b8aceb28d0e8ac2c576120215adfc02402bc13b2c7ec71a7983dece7cd401357f1f8a5da61c46db47d9de9301cdf3308f1736ea84a5e99d901f1ad25aa2885dc8f52e30521e3aab0a0ce34e54866fc1a06bf10c4705dd2f819837e2107100b5502cdaeb820a3480f76af38614c7dc0c991149625d1b43128e03ed7d0bc17d92e31d0e8a7206aee13cb3bcb2d78e2c2933dc491c4fef32ec5e417701b16c8e43660813036e22671f325dc8d9d5d77094d159b0a8d24db957e9dc4c05d0d99c910f2c736e2526a3a6a09001b540c1e07102cc9173ebe137329ec2640b0c3dbde7064d1ce7552379592e09e4dff13db40352c4ec6bdbc5701f081c0d760c4051c34b7a7dda44153f206b7f035d56ca82485c3fc137c47feb3bea6a0caf17d328c2831951eb6915f203600f31ea4b779853f2b3d936567cb3d7ea091d1688b91814d56a35f7f2171e922cd90c5a1f80bb3dd84259ce34ade06ebd244886915d65851e1fa6df2708e4a1fb97b54652acfc0c4db3dd9c8c60d74e357819fcc5ec9590abb2d609112d7810065013e23f59a45bb260370243c08d0b1350422d0d5dfb0858bd20399f11b9415cc474af9af4fc856ed1a9e1be4acc4035d18789542674b4d4d5be301120eb051016cadf7133647dec0dc5d181bb0dc3df0daba1cd15a41f401f50f3eb1471eb79ce42a66fdf3874ad00943d1bc26fc51891480008c8877b87b659f2931eba822ccd7a2f98b699887b04656b185d16f898a45d53ebd9f92f903c2a440208870cfb6076026d2c8e133cd05ae3a39cf4f3ecfaf82a78b0de7a363693795e002d7a2c21d9e5e665999e58f0cfc7b232942a167bbe579b28c0777b254c96d8216d71eb92f0375bf7817b60ca4b6608804458b43003d9ff79b17685eddb663c2be406c01e63d496ef30a7e567b26cacf967afd4123a2d11723029aad46befe41f6aed29d5db9b959b049ea65a80d84700c9b10d95d68b4d251385f26b74ee8c12f1d3938d53629446d895674d4f43e1082bb2471972e988d7f6e23a027ded340678b9fd44cb2992f2ac8c28401daf7b0f8db3809d0f47c48ada3e819986ebdc07f8d1e385ba6d6e8b0c6b6df362a8b5c9d1c65214e45e447b6ad7cf4d62f13b1c92b9da8e23eccdccf2c5b1012a635b4d82fc5b6a58719fc4810a643b0f9c412e1038904bf50c022f1537af4aa21a63a9c5da7c1e727525900c7f7cec14cddf0f5ee63392d626973cf28d0af7acecb40675f008598370c055befc169e1e59e720c7a22d0522c14ed42e79eaa82c400c631e4866d97218c291ff84632ea376a71810188bb7764540e722985752fb2dfca98d47ff82f0a0e7cdee3f3a51a917c10fa7f54d5958994c4233debfcfa9ad8398e81249aab93fd06d5ab3206142b2450879785e7b52e2d914c02bc01a43e44922fdc4b0a216f05e9b572b7e20e0e1e726edd1847e35528acb6620bfd2866f821dd5f694f25ce8af4035c38fc36c629207fb236a1bd56a91a7ee150c849be52fa28d94e99a5e9f4c56db46d54f3bc971027ccc85f8a5488d3dc08b302a6892decca0012ac42767ae5a4a026e4ca1f3c119eaa36266e886084ac8a76d70b6ebeda6f4b05c42c0283e4001a28a2f8a4597114387f7a1c8b87ccc36bcfadbc659c93a76631e87b9bbd3bd78bfa7455a68bb26dd9ea6cd18ca9894b21471240cc616256b36d49b167a61e98ba09d847746cb0c1366e317373c8aa4dd2630ead1da05e82c224234b9c85ed1bc8bffd39424da21ad7d9242874ea66d587da733184652d320f5f8481686ecfdcf6cf612b102ea1f5e758d97ed23c4e2b71f8a3db445154412499da91925804e436c27a129b23f0e4fc09230c992d4f35a76c3c0a44e028d60176aed8b7830e9093bfa041515652487c864b314fc09b8575c00b8b13b6ebfd03bb4d0843b2a42ef804d2ed20e632a84e2423bce263b36f5eae9e8180f7a4a045ca214a02c1b736552035a1874b9";
+        proof = hex"22bdb408410437802c8251c891ecbb914a2d780ea7c8845c7739f6b151ee427b0d78dff55fefd936ec8a95013c46de2e97ca1cb6fa0a3eedc9e7b21a1708580111f68c1bc7a96c4ed4c9f5376f4a5c88931e597afa3e79914c4b2b59c98d796d0cec2fc2d2cf6cecbb73190d981e08bc216986f64a41ef81b1b0710f8128b297129425432a1f16420a215228bc1a07e3e884f081993c3019da943f2999049eb62d322a0bffa6bffc4a6b9c32578b89e118a4e43746c8a1984113fd9def24bd7a17205d83ee72789edd4eb099688ed369016f47b6b48b97e1131c4676fb4a933d0eed5caa32cea889c51d3596efc6886517093493bc74e6b4a8e8f6d2015f90a20693d5517db300d9a0e92d06d8ea2659dcb93590c6e63755e57411ad11d61be91d67352ecef900605e3f3232e15582ecf1bf1cdcf525e4eac9d7c2faf09f177f24e476990c522c4c46b3ca6a7671bed06d158da9e59863fd1b57ede872b9bcf330341634075502839eba4c80308054cbeeffa83b2ad6381222f1ce048e1dc94b1ccf03b5e02635c16770eebb0e015ca2ae3d525b4284415f9e8951a704a93a7f1aee7b9971ca8a009528a3fa1f9a83a78915da123091d6d2c070f8af352ad82c03be6d4dacf63e63116bfffd437fac7acb5bd95343764ea98190ce038fed023f1d8ea6d901f9e098abdcaa196f849e50709573fea2a835cdccd45f5ac926566f2654c8bb233df9c44e9f9c00befa0b5e6eae3d82d8af882af50a7a47b78b5bda03bf2be597eeb797c2f2d6f2236b7e85e6c726c9a2f455dd0979005ef1acd5b42c13b2a691a77874884bb1af621156ef2f9a2d808f67f8b17e2a0a946a1dc10206fafdd2abf2736549c20dbd433dd2dece87e046bec7b1b3c109bd51559874042eb3c132ddc1c3fea2b2a30ad64c84ff3d9122ea8fd5ad7d81e99e25207bf9460c78d0c5002287b79d263b3b2b0f54edd41fa2f1897548a11b20bc8dd3de921124d026607c1e8976f62eeeea98072569827394baaf0ddce03ba6703ba602b05f1e094b620675120f0c6bc094802f510580d9b9047862ae7927a4b31d2c229b6b2b5563624cb73ddf97cf73fb11a448f50138c8aa31029dda1c09ed69cbbda2120522de880a0f8a3a0d25e0f880b4d311a1924c8762d3f88b5f32dded740329e72d21ead4b5a65626f786eb2e3ac932452e5abd240af22a35b2b32bb7012e02bd28c4d97919d6cedbb221af54d0372090cd3d21dd74f9bd61c82ca079977e4199041b4fda70480b92e09f6e36d30f46c650186146223bafbcb7d7cec18d92ba0800609b0c6f53c051a69882c319a069e2c049c5fbbb75de42a6d61802c2835d8d119764ce7c7f7505dd98c246be65eaad2749b3d3deb157eef1e1ddef2167253b2b221bd796cec3c9a8d9e22d331bc87e4d18ab729d344109641b7fa599baec8b24bec8cd53ec5cb16a31acefcc192723f8f6704d97bbd80c0f713a7d35c80d5f0b2874002711b54d190075448567cd3557ff8a707742941a31748eebc3fe1c691905ce04799c91c4a992c868e0acd8f2fc5b940615f611cb78822f6f8fc053360ea549237b65f9af7a0df4929f78287ca1c6c2b6873be338532777a632fcb20418e3629f8fb4404ac05b0a4e0b42ed9a456fa803f15a981631c8820fc5ac426f1eec05fa8d49baf54322608c71650e876157b45026bd0bc97538dcf1d8ac140e1cfb1a5ef5be2fb68b729c6b532906532ecd75a656681d0897261318b9a2c0f32849b11158f5755bcc4541411e6ccd7b02625ef6f8f8c0233f9f901e0e1626831decaeecacf35a7f40edc826ee64855ee7d7973f42878045b3479662e5622e7b2d49db559ebd414f412a3e0d06438ccf1701b4c60f4e750a7d481bd93460a76427d517fd9a3c400fc90eaf868ebec5fdf61b0256e4fd0ea206697c4fdaa7b24a19194327c6a719391c13142916b0f5eac9b8f852b5be3f86db007f667b901abd1728578c2f1b8dfa64635007f874edb6972eb9a8e56950c5fcedb58d5c86c7a215376bf0979002bbacb38be6da38e58264a47aff151462051edaebb43d7d7487134680550004777cf503c7c5bbfcdd4e321a3c5544bf734440c821db1e74216c1b0a2ec35e32a477d3c2d84a34ecfe1efc4336fc86132e47b913493f9a996dd81c832a7c22cf3d3b075043164869177ffbb958a563ea632dec47b03f5e6e18f22893b99482f3b472d93459bcc6564f2eba24acdbb9ba1a6fb7c6fe5aa1ffd86b0d615c9b52640d49d7f9964c4b831d5a2268a927980199b978ffb20c458a57d40e43933579ef1fe2eeb38d08070317a040fe9c1c1030347159eaab1b5e48062c08275448badee5ed8f07d39c4b88281b83e7f676bbf0f4569867723338d05d9713cd5bae740b46915e139ebeddb84325ee6333763f5386af44cf8a891c62b59b184c04252f92712ad2e9d1fc31aebc83dd7cfda2b71d4fbadc36e6b34c00c800218f541ab6d930d7f7411a8a8c48896a6a605752e12bb9e41fe88976aa86ba6401166cdbd85b2e3bf648f88788c27ebe900e03d73224a62f8665cd08d422ae93015f6ab774768f8390b94ebb74b10a2abf6e810630951a7b0193f884f8e3e78a04f6f57f904883259b8b84fcaaf029a4113b1bbcd3c079369f2ccd11d9ddf2e32cdc70a84752f5be41a5cceb6a74ecf6a87514d6e627f1c4737921c54be0252e186752d232010f79404b7b23c7e8a9dca264e26f3c79384c307ce9cbc4dd7d9c03f234fc1caf29343ef1295c255c66c29c54b00792ca7ed3ed80b1d23ddad60a1fe16598e88ee318f5e71d4b04517c05be7865e862d535ecee666f6ca6d82e791cb262c39788496ea0ae9cd6d49c093b31e01262cc956d28fe9a5b9a7884c3802d24bd765c92615ce462d9fd3d4bc043c8e3537c0cf95767ab38af2cf1451123091cefddc7cb56b0736def3f340be89e98e53144f2e860a28ebc3af128f94fd526339a454e2ca9c43517e3aacfb7c787432af4a14e63d1e28c4a31cee9b121cb";
 
         deal(bob, 100 ether);
         deal(babe, 100 ether);
@@ -64,12 +65,12 @@ contract ZeroLinkTest is Test {
         bytes32 root = zerolink.getLastRoot();
 
         vm.prank(babe);
-        zerolink.withdraw(proof, nullifierSecretHash, root);
+        zerolink.withdraw(proof, nullifier, root);
 
         assertEq(babe.balance, 100 ether);
     }
 
-    /// Can successfully withdraw with old root.
+    // /// Can successfully withdraw with old root.
     function test_withdraw_old_root() public {
         vm.prank(babe);
         zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
@@ -81,16 +82,90 @@ contract ZeroLinkTest is Test {
 
         // Alice's proof is still valid.
         vm.prank(babe);
-        zerolink.withdraw(proof, nullifierSecretHash, root);
+        zerolink.withdraw(proof, nullifier, root);
     }
 
-    /// Can't withdraw with a valid proof but invalid root.
+    // /// Can't withdraw with a valid proof but invalid root.
     function test_withdraw_revert_InvalidRoot() public {
 
         // `root` corresponds to valid proof, but it was never committed.
         vm.prank(babe);
         vm.expectRevert(ZeroLink.UnknownRoot.selector);
-        zerolink.withdraw(proof, nullifierSecretHash, bytes32(bytes("nope")));
+        zerolink.withdraw(proof, nullifier, bytes32(bytes("nope")));
+    }
+
+    //  /// The same `nullifier` cannot be used twice.
+    function test_withdraw_revert_NullifierUsed() public {
+
+        vm.prank(babe);
+        zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+
+        bytes32 root = zerolink.getLastRoot();
+        vm.prank(babe);
+        zerolink.withdraw(proof, nullifier, root);
+
+        vm.prank(babe);
+        vm.expectRevert(ZeroLink.NullifierUsed.selector);
+        zerolink.withdraw(proof, nullifier, root);
+    }
+
+    // /// Cannot modify `nullifier` in proof.
+    function test_verify_revert_PROOF_FAILURE_invalid_nullifier(uint nullifier_) public {
+
+        vm.prank(babe);
+        zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+
+        bytes32 root = zerolink.getLastRoot();
+
+        vm.assume(nullifierSecretHash != nullifier_);
+
+        vm.expectRevert();
+        zerolink.withdraw(proof, nullifier_, root);
+    }
+
+    /// Cannot modify `root` in proof.
+    function test_verify_revert_PROOF_FAILURE_invalid_root(bytes32 root_) public {
+
+        vm.prank(babe);
+        zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+
+        bytes32 root = zerolink.getLastRoot();
+
+        vm.assume(root != root_);
+
+        vm.expectRevert();
+        zerolink.verifyProof(nullifier, root_, proof);
+    }
+
+    /// Cannot modify `proof`.
+    function test_verify_revert_invalidProof(bytes calldata proof_) public {
+        vm.assume(keccak256(proof) != keccak256(proof_));
+
+        vm.prank(babe);
+        zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+
+        bytes32 root = zerolink.getLastRoot();
+
+        vm.expectRevert();
+        zerolink.verifyProof(nullifier, root, proof_);
+    }
+
+    /// Cannot modify any proof inputs.
+    function test_verify_revert_invalidInputs(address sender, bytes calldata proof_, uint nullifier_, bytes32 root_)
+        public
+    {
+        bool validProof;
+        vm.prank(babe);
+        zerolink.deposit{value: 0.001 ether}(nullifierSecretHash);
+        bytes32 root = zerolink.getLastRoot();
+        validProof = validProof && root == root_;
+        validProof = validProof && sender == babe;
+        validProof = validProof && nullifier == nullifier_;
+        validProof = validProof && keccak256(proof) == keccak256(proof_);
+        vm.assume(!validProof);
+
+        vm.expectRevert();
+        zerolink.verifyProof(nullifier_, root_, proof_);
     }
 
 }
