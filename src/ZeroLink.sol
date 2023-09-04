@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {UltraVerifier} from "../circuits/contract/ZeroLink/plonk_vk.sol";
+import {UltraVerifier} from "../circuits/CommitmentProver/contract/CommitmentProver/plonk_vk.sol";
 import {MerkleLib, DEPTH} from "./MerkleLib.sol";
 
 contract ZeroLink is UltraVerifier {
@@ -87,6 +87,10 @@ contract ZeroLink is UltraVerifier {
         } while (index != endIndex);
 
         return false;
+    }
+
+    function checkSubsetExclusion(bytes32 nullifier, bytes32 root_, bytes32 subsetRoot, bytes calldata proof) external view {
+        // TODO: Use from the contract!
     }
 
     function _verifyProof(address receiver, bytes32 nullifier, bytes32 root_, bytes calldata proof) internal view {

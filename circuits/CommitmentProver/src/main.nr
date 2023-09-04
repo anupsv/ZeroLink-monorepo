@@ -53,17 +53,6 @@ fn get_node(nodes: [u8; 32 * DEPTH], index: Field) -> [u8; 32] {
   out
 }
 
-// // #issue (https://github.com/noir-lang/noir/issues/2417)
-// fn zeros(level: Field) -> [u8; 32] {
-//   let mut out: [u8; 32] = [0; 32];
-
-//   for _ in 0..(level + 1) {
-//     out = hash(out, out);
-//   }
-
-//   out
-// }
-
 fn zeros(level: Field) -> [u8; 32] {
   let mut out: [u8; 32] = [0; 32];
 
@@ -102,10 +91,8 @@ fn main(
   assert(compute_merkle_root(key, leaf, nodes) == root);
 
   // Tie `receiver` into proof.
-  // TODO: Is this safe enough?
   assert(receiver != 0);
 }
-
 
 
 
@@ -140,6 +127,7 @@ fn test_compute_merkle_root() {
 
 }
 
+
 #[test]
 fn test_main() {
   let receiver  = 0x00000000000000000000000000000000000A11cE;
@@ -149,6 +137,7 @@ fn test_main() {
   let leaf      = hash(nullifier, secret);
   let nodes     = helper_get_zero_nodes();
   let root      = compute_merkle_root(key, leaf, nodes);
+
 
   std::println("receiver =");
   std::println(receiver);

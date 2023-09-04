@@ -5,7 +5,7 @@ import {Test, console2 as console} from "forge-std/Test.sol";
 
 import {ZeroLink} from "../src/ZeroLink.sol";
 import {MerkleLib, DEPTH} from "../src/MerkleLib.sol";
-import {BaseUltraVerifier} from "../circuits/contract/ZeroLink/plonk_vk.sol";
+import {BaseUltraVerifier} from "../circuits/CommitmentProver/contract/CommitmentProver/plonk_vk.sol";
 
 import {NoirTestBase} from "./utils/NoirTestBase.sol";
 
