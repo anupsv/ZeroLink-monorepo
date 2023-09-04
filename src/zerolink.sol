@@ -12,12 +12,14 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
     error RefundFailed();
     error InvalidDepositAmount();
     error UnknownRoot();
+    error LeafAlreadyCommitted();
 
     uint256 constant DEPOSIT_AMOUNT = 0.001 ether;
     // left to right is the order, same as how the leaves are filled.
-    uint blocked = 0;
+    uint blocked = 9999999;
 
     mapping(uint => bool) nullifierUsed;
+    mapping(uint => bool) committedNullifier;
 
     constructor() MerkleTreeWithHistory() {}
 
@@ -30,6 +32,9 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
     function deposit(uint nullifierSecretHash) public payable returns (uint256) {
         // Require 1 ether deposit value.
         if (msg.value != DEPOSIT_AMOUNT) revert InvalidDepositAmount();
+        
+        if (committedNullifier[nullifierSecretHash]) revert LeafAlreadyCommitted();
+        committedNullifier[nullifierSecretHash] = true;
 
         // Compute and update root with `nullifierSecretHash` inserted at `key` index.
         bytes32 leaf = bytes32(Poseidon.hash([nullifierSecretHash, uint(1)]));
@@ -54,11 +59,11 @@ contract ZeroLink is MerkleTreeWithHistory, UltraVerifier {
         //   - The leaf is contained in merkle tree with `subTreeRoot`.
         //   - The subroot is now a leaf of the depositTreeRoot
         //   - The proof is generated for `receiver`.
-        // _verifyProof(nullifier, subTreeRoot, proof);
+        _verifyProof(nullifier, subTreeRoot, proof);
 
         // Refund caller.
-        // (bool success,) = msg.sender.call{value: DEPOSIT_AMOUNT}("");
-        // if (!success) revert RefundFailed();
+        (bool success,) = msg.sender.call{value: DEPOSIT_AMOUNT}("");
+        if (!success) revert RefundFailed();
     }
 
     function _verifyProof(uint nullifier, bytes32 subTreeRoot, bytes calldata proof) internal view {

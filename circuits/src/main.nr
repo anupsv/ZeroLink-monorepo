@@ -32,7 +32,8 @@ fn main(subTreeRoot: pub Field, subTreePath: [Field; 2], nullifier: pub Field, r
   verify_tree(std::hash::poseidon::bn254::hash_2([nullifier, 1]), subTreeLeafIndex, subTreePath, subTreeRoot);
 
   // Step 3: check if the leaf is blocked from withdrawal
-  // assert(((blocked as u32) & (1 << (subTreeLeafIndex as u32))) == 0x01);
+  let bits = blocked.to_le_bits(32);
+  assert(bits[0] == 0x01);
 
 }
 
@@ -61,14 +62,14 @@ fn test_subtree_allow_verification_with_deposit_tree() {
   let sub_tree_root = std::hash::poseidon::bn254::hash_2([sub_tree_left_branch,  sub_tree_right_branch]);
 
   // std::println(std::hash::poseidon::bn254::hash_2([1234, 1]));
-  std::println(sub_tree_1);
-  std::println(sub_tree_2);
-  std::println(sub_tree_left_branch);
-  std::println(sub_tree_right_branch);
-  std::println(sub_tree_root);
-  let x :Field = 268435455268435455;
+  // std::println(sub_tree_1);
+  // std::println(sub_tree_2);
+  // std::println(sub_tree_left_branch);
+  // std::println(sub_tree_right_branch);
+  // std::println(sub_tree_root);
+  let x :Field = 123;
 
-  std::println(x as u64 & 0xff);
+  std::println(x.to_le_bits(32).len());
 
 //   // // Now the main tree
 //   // let main_tree_1 = std::hash::pedersen([110386806875492])[0]; // some other deposit
