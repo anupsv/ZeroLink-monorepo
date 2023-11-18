@@ -2,6 +2,7 @@
 
 ZK privacy pools using [Noir](https://noir-lang.org/).
 
+### Disclaimer: This project is intended for educational purposes only. The creators assume no responsibility for any illegal activities carried out with it, and the code is made public for viewing purposes only.
 ```ml
 .
 ├── README.md
